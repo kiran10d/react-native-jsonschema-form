@@ -12,7 +12,7 @@ function rangeOptions(start, stop) {
 }
 
 function readyForChange(state) {
-  return Object.keys(state).every(key => state[key] !== -1);
+  return Object.keys(state).every((key) => state[key] !== -1);
 }
 
 function DateElement(props) {
@@ -39,9 +39,9 @@ function DateElement(props) {
       placeholder={type}
       value={value}
       disabled={disabled}
-      readonly={readonly}
-      autofocus={autofocus}
-      onChange={value => select(type, value)}
+      readOnly={readonly}
+      autoFocus={autofocus}
+      onChange={(value) => select(type, value)}
       onBlur={onBlur}
     />
   );
@@ -51,8 +51,8 @@ class AltDateWidget extends Component {
   static defaultProps = {
     time: false,
     disabled: false,
-    readonly: false,
-    autofocus: false,
+    readOnly: false,
+    autoFocus: false,
     options: {
       yearsRange: [1900, new Date().getFullYear() + 2],
     },
@@ -63,8 +63,16 @@ class AltDateWidget extends Component {
     this.state = parseDateString(props.value, props.time);
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState(parseDateString(nextProps.value, nextProps.time));
+  componentDidUpdate(prevProps) {
+    {
+      /* Fix: Changed componentWillReceiveProps to componentDidUpdate */
+    }
+    if (
+      prevProps.value !== this.props.value ||
+      prevProps.time !== this.props.time
+    ) {
+      this.setState(parseDateString(this.props.value, this.props.time));
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -83,20 +91,20 @@ class AltDateWidget extends Component {
     );
   };
 
-  setNow = event => {
+  setNow = (event) => {
     event.preventDefault();
-    const { time, disabled, readonly, onChange } = this.props;
-    if (disabled || readonly) {
+    const { time, disabled, readOnly, onChange } = this.props;
+    if (disabled || readOnly) {
       return;
     }
     const nowDateObj = parseDateString(new Date().toJSON(), time);
     this.setState(nowDateObj, () => onChange(toDateString(this.state, time)));
   };
 
-  clear = event => {
+  clear = (event) => {
     event.preventDefault();
-    const { time, disabled, readonly, onChange } = this.props;
-    if (disabled || readonly) {
+    const { time, disabled, readOnly, onChange } = this.props;
+    if (disabled || readOnly) {
       return;
     }
     this.setState(parseDateString("", time), () => onChange(undefined));
@@ -125,15 +133,8 @@ class AltDateWidget extends Component {
   }
 
   render() {
-    const {
-      id,
-      disabled,
-      readonly,
-      autofocus,
-      registry,
-      onBlur,
-      options,
-    } = this.props;
+    const { id, disabled, readOnly, autoFocus, registry, onBlur, options } =
+      this.props;
     return (
       <ul className="list-inline">
         {this.dateElementProps.map((elemProps, i) => (
@@ -143,10 +144,10 @@ class AltDateWidget extends Component {
               select={this.onChange}
               {...elemProps}
               disabled={disabled}
-              readonly={readonly}
+              readOnly={readOnly}
               registry={registry}
               onBlur={onBlur}
-              autofocus={autofocus && i === 0}
+              autoFocus={autoFocus && i === 0}
             />
           </li>
         ))}
@@ -166,7 +167,8 @@ class AltDateWidget extends Component {
             <a
               href="#"
               className="btn btn-warning btn-clear"
-              onClick={this.clear}>
+              onClick={this.clear}
+            >
               Clear
             </a>
           </li>
@@ -183,8 +185,8 @@ if (process.env.NODE_ENV !== "production") {
     value: PropTypes.string,
     required: PropTypes.bool,
     disabled: PropTypes.bool,
-    readonly: PropTypes.bool,
-    autofocus: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    autoFocus: PropTypes.bool,
     onChange: PropTypes.func,
     onBlur: PropTypes.func,
     time: PropTypes.bool,
